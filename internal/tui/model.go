@@ -177,7 +177,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				return m, nil
 			case "down", "j", "right", "l":
-				if m.durCur < 4 { // 0, 15, 30, 60, 120
+				if m.durCur < len(durations)-1 {
 					m.durCur++
 				}
 				return m, nil

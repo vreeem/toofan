@@ -94,35 +94,26 @@ func loadProfile() profileData {
 		}
 	}
 
-	if len(wordsTests) >= 10 {
-		sum := 0.0
-		for i := len(wordsTests) - 10; i < len(wordsTests); i++ {
-			sum += wordsTests[i].WPM
-		}
-		pd.RecentAvg = sum / 10.0
-	} else if len(wordsTests) > 0 {
-		sum := 0.0
-		for _, e := range wordsTests {
-			sum += e.WPM
-		}
-		pd.RecentAvg = sum / float64(len(wordsTests))
-	}
-
-	if len(codeTests) >= 10 {
-		sum := 0.0
-		for i := len(codeTests) - 10; i < len(codeTests); i++ {
-			sum += codeTests[i].WPM
-		}
-		pd.RecentCodeAvg = sum / 10.0
-	} else if len(codeTests) > 0 {
-		sum := 0.0
-		for _, e := range codeTests {
-			sum += e.WPM
-		}
-		pd.RecentCodeAvg = sum / float64(len(codeTests))
-	}
+	pd.RecentAvg = avgWPM(wordsTests)
+	pd.RecentCodeAvg = avgWPM(codeTests)
 
 	return pd
+}
+
+// avgWPM returns the average WPM of the last 10 tests (or fewer if < 10 exist).
+func avgWPM(tests []testEntry) float64 {
+	if len(tests) == 0 {
+		return 0
+	}
+	n := 10
+	if len(tests) < n {
+		n = len(tests)
+	}
+	sum := 0.0
+	for i := len(tests) - n; i < len(tests); i++ {
+		sum += tests[i].WPM
+	}
+	return sum / float64(n)
 }
 
 func parseResultLine(line string) (testEntry, bool) {
