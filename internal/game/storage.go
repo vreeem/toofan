@@ -66,7 +66,7 @@ func GetPB(duration int, mode string) float64 {
 					}
 				}
 			} else {
-				// old format fallback
+				// TODO: remove old format fallback once no users have pre-mode pb.txt files
 				dur, _ := strconv.Atoi(key)
 				if dur == duration && mode == "words" {
 					return val
