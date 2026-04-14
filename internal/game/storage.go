@@ -8,15 +8,13 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"github.com/adrg/xdg"
 )
 
-var configDir string
 var dataDir string
 
 func init() {
-	configDir = filepath.Join(xdg.ConfigHome, "toofan")
-	dataDir = filepath.Join(xdg.DataHome, "toofan")
+	configDir, _ := os.UserConfigDir()
+	dataDir = filepath.Join(configDir, "toofan")
 }
 
 // SaveResult appends a line to results.txt — human readable
@@ -105,7 +103,7 @@ func SavePB(duration int, mode string, wpm float64) {
 func LoadConfig() (duration int, mode string, language string, themeName string) {
 	duration, mode, language, themeName = 30, "words", "go", "tokyonight"
 
-	path := filepath.Join(configDir, "config.txt")
+	path := filepath.Join(dataDir, "config.txt")
 	f, err := os.Open(path)
 	if err != nil {
 		return
@@ -133,8 +131,8 @@ func LoadConfig() (duration int, mode string, language string, themeName string)
 }
 
 func SaveConfig(duration int, mode string, language string, themeName string) {
-	os.MkdirAll(configDir, 0755)
-	f, err := os.Create(filepath.Join(configDir, "config.txt"))
+	os.MkdirAll(dataDir, 0755)
+	f, err := os.Create(filepath.Join(dataDir, "config.txt"))
 	if err != nil {
 		return
 	}
@@ -169,36 +167,22 @@ func SplitBundle(content string) map[string]string {
 }
 
 func SaveBackup() (string, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-	backupDir := filepath.Join(home, "Toofan")
+	backupDir := filepath.Join(dataDir, "backups")
 	os.MkdirAll(backupDir, 0755)
 
 	stamp := time.Now().Format("2006-01-02_15-04")
 	dest := filepath.Join(backupDir, fmt.Sprintf("toofan_backup_%s.txt", stamp))
 
 	var bundle strings.Builder
-
-	files := []struct {
-		name, dir string
-	}{
-		{"results.txt", dataDir},
-		{"pb.txt", dataDir},
-		{"config.txt", configDir},
-	}
-
-	for _, f := range files {
-		data, err := os.ReadFile(filepath.Join(f.dir, f.name))
+	for _, name := range []string{"results.txt", "pb.txt", "config.txt"} {
+		data, err := os.ReadFile(filepath.Join(dataDir, name))
 		if err != nil {
 			continue
 		}
-		bundle.WriteString("### " + f.name + "\n")
+		bundle.WriteString("### " + name + "\n")
 		bundle.Write(data)
 		bundle.WriteString("\n")
 	}
-
 	if err := os.WriteFile(dest, []byte(bundle.String()), 0644); err != nil {
 		return "", err
 	}
@@ -211,18 +195,13 @@ func RestoreBackup(src string) error {
 		return err
 	}
 	for name, data := range SplitBundle(string(raw)) {
-		if name == "config.txt" {
-			os.WriteFile(filepath.Join(configDir, name), []byte(data), 0644)
-		} else {
-			os.WriteFile(filepath.Join(dataDir, name), []byte(data), 0644)
-		}
+		os.WriteFile(filepath.Join(dataDir, name), []byte(data), 0644)
 	}
 	return nil
 }
 
 func ListBackups() ([]string, string) {
-	home, _ := os.UserHomeDir()
-	backupDir := filepath.Join(home, "Toofan")
+	backupDir := filepath.Join(dataDir, "backups")
 	files, _ := filepath.Glob(filepath.Join(backupDir, "toofan_backup_*.txt"))
 	return files, backupDir
 }

@@ -8,11 +8,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"github.com/adrg/xdg"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"toofan/internal/theme"
+	"github.com/vyrx-dev/toofan/internal/theme"
 )
 
 type profileData struct {
@@ -43,7 +42,11 @@ func loadProfile() profileData {
 	pd.Best["words"] = make(map[int]float64)
 	pd.Best["code"] = make(map[int]float64)
 
-	dataDir := filepath.Join(xdg.DataHome, "toofan")
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return pd
+	}
+	dataDir := filepath.Join(configDir, "toofan")
 
 	f, err := os.Open(filepath.Join(dataDir, "results.txt"))
 	if err != nil {
