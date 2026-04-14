@@ -76,7 +76,6 @@ Your typing history, personal bests, rank, and activity map all in one place. Pr
 ```bash
 curl -fsSL https://raw.githubusercontent.com/vyrx-dev/toofan/master/install.sh | sh
 ```
-*(If you set up your subdomain redirect, you can change this to `curl -fsSL https://toofan.vyrx.dev | sh`)*
 
 <br>
 
