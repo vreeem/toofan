@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"github.com/adrg/xdg"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -46,7 +47,7 @@ func loadProfile() profileData {
 	if err != nil {
 		return pd
 	}
-	dataDir := filepath.Join(home, ".toofan")
+	dataDir := filepath.Join(xdg.DataHome, "toofan")
 
 	f, err := os.Open(filepath.Join(dataDir, "results.txt"))
 	if err != nil {
